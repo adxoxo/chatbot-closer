@@ -1,0 +1,20 @@
+# Cloudflare Tunnel config — TQ Chatbot #1 (dedicated "tq-chat" tunnel)
+#
+# This is a standalone tunnel so it never interferes with other tunnels on this
+# machine. Single hostname serves the whole app (SPA + API under /api), because
+# the FastAPI backend serves frontend/dist alongside the API.
+#
+# Setup (already done once):
+#   cloudflared tunnel create tq-chat
+#   cloudflared tunnel route dns 006aee60-3b79-44ec-8579-e6a7bab95f01 chat.aquryu.space
+#
+# Run:
+#   cloudflared tunnel --config /home/adyu/apps/tqchat/cloudflare/config.yml run tq-chat
+
+tunnel: 006aee60-3b79-44ec-8579-e6a7bab95f01
+credentials-file: /home/adyu/.cloudflared/006aee60-3b79-44ec-8579-e6a7bab95f01.json
+
+ingress:
+  - hostname: chat.aquryu.space
+    service: http://localhost:8000
+  - service: http_status:404

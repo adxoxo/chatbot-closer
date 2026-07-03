@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TQ Chatbot Admin - Landing Preview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ffb4ab",
+                    "surface-tint": "#c4c0ff",
+                    "surface": "#131316",
+                    "secondary-fixed": "#86f8c9",
+                    "on-secondary-container": "#003121",
+                    "surface-container-high": "#2a2a2d",
+                    "inverse-on-surface": "#303033",
+                    "surface-bright": "#39393c",
+                    "outline-variant": "#464555",
+                    "primary-fixed-dim": "#c4c0ff",
+                    "surface-dim": "#131316",
+                    "tertiary-fixed-dim": "#ffb95d",
+                    "on-tertiary-container": "#3d2400",
+                    "inverse-surface": "#e4e1e6",
+                    "background": "#131316",
+                    "surface-container": "#1f1f22",
+                    "on-tertiary": "#462a00",
+                    "tertiary-fixed": "#ffddb7",
+                    "primary-fixed": "#e3dfff",
+                    "tertiary-container": "#c98100",
+                    "secondary": "#68dbae",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#100069",
+                    "primary": "#c4c0ff",
+                    "surface-container-lowest": "#0e0e11",
+                    "error-container": "#93000a",
+                    "surface-container-highest": "#353438",
+                    "surface-container-low": "#1b1b1e",
+                    "on-error": "#690005",
+                    "on-secondary-fixed": "#002115",
+                    "on-secondary-fixed-variant": "#00513a",
+                    "outline": "#918fa1",
+                    "on-background": "#e4e1e6",
+                    "on-primary-container": "#1b0091",
+                    "on-primary-fixed-variant": "#3622ca",
+                    "on-surface-variant": "#c7c4d8",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-variant": "#353438",
+                    "on-secondary": "#003827",
+                    "on-surface": "#e4e1e6",
+                    "secondary-container": "#26a37a",
+                    "tertiary": "#ffb95d",
+                    "inverse-primary": "#4f44e2",
+                    "primary-container": "#8781ff",
+                    "on-primary": "#2000a4",
+                    "secondary-fixed-dim": "#68dbae",
+                    "on-tertiary-fixed": "#2a1700"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "xl": "48px",
+                    "gutter": "16px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "margin": "24px"
+            },
+            "fontFamily": {
+                    "caption": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h2": ["Inter"],
+                    "h1": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-mono": ["JetBrains Mono"],
+                    "h1-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "caption": ["12px", {"lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "h2": ["20px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "label-mono": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "h1-mobile": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        @keyframes custom-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(108, 99, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(108, 99, 255, 0); }
+        }
+        .animate-widget-pulse {
+            animation: custom-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .glass-panel {
+            background: rgba(24, 24, 28, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(42, 42, 48, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary selection:text-on-primary antialiased overflow-x-hidden">
+<!-- Client Website Placeholder (Modern SaaS Landing Page) -->
+<main class="relative min-h-screen">
+<!-- Navbar Placeholder -->
+<nav class="flex items-center justify-between px-lg py-md border-b border-outline-variant/30 sticky top-0 z-10 bg-background/80 backdrop-blur-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<span class="font-h2 text-h2 tracking-tighter">FLUXCORE</span>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary transition-colors" href="#">PLATFORM</a>
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary transition-colors" href="#">SOLUTIONS</a>
+<a class="font-label-mono text-label-mono text-on-surface-variant hover:text-primary transition-colors" href="#">PRICING</a>
+<button class="bg-surface-container-high px-md py-sm rounded-lg font-label-mono text-label-mono hover:bg-surface-container-highest transition-all">SIGN IN</button>
+<button class="bg-primary text-on-primary px-md py-sm rounded-lg font-label-mono text-label-mono hover:opacity-90 transition-all">GET STARTED</button>
+</div>
+</nav>
+<!-- Hero Section -->
+<section class="px-lg py-xl flex flex-col items-center text-center max-w-5xl mx-auto space-y-lg">
+<div class="inline-flex items-center gap-sm px-sm py-xs bg-surface-container-low border border-outline-variant rounded-full">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-mono text-[10px] uppercase tracking-widest text-on-surface-variant">Version 4.0 Now Live</span>
+</div>
+<h1 class="font-h1 text-6xl md:text-8xl font-black tracking-tighter leading-none">
+                PRECISION <span class="text-primary italic">INFRASTRUCTURE</span> <br/>FOR DIGITAL SCALE
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                Deploy, monitor, and scale your neural networks with surgical efficiency. FluxCore provides the backbone for the world's most demanding generative applications.
+            </p>
+<div class="flex flex-col sm:flex-row gap-md pt-md">
+<button class="bg-primary text-on-primary px-xl py-md rounded-xl font-h2 text-h2 flex items-center gap-sm hover:scale-[1.02] transition-transform">
+                    Deploy Instantly
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="bg-transparent border border-outline-variant text-on-surface px-xl py-md rounded-xl font-h2 text-h2 hover:bg-surface-container transition-colors">
+                    View Documentation
+                </button>
+</div>
+<!-- Bento Grid Section -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter w-full mt-xl">
+<!-- Large Feature Card -->
+<div class="md:col-span-8 h-[400px] rounded-xl relative overflow-hidden glass-panel group">
+<img class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700" data-alt="A high-tech control center with multiple holographic data visualizations floating over a dark, sleek minimalist console. The lighting is dominated by deep indigo and electric cyan glows, creating a professional and futuristic atmosphere for a high-performance SaaS brand. The background shows blurred server racks in a dark data center." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoJtuSiZFQfSHsktjU5wZ-dqrQqM4prAsmwZdvFaIWVHyGFj1Tp525l6qzFysYeCQCt1sBvySbl0pJSNxsc14rJ5B6QQOAK_2r1PJYJSQ1D439C_kEAodXja8QHE35A7reBhVrGboSlq-5D9wfRAGxtZ9XXPlLlRw4hd86qa6WTQq1TVxbvyaaUWEgqa61Er-XqXBrhMNEd6mBIrn8RzwvjGnmNDC_2SpmcY1o8TVRqDXU9TvPkxL9-f8DO_ua8q2EJErPoXWubFW6"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-lg text-left">
+<span class="font-label-mono text-primary bg-primary/10 px-sm py-xs rounded border border-primary/20 mb-sm inline-block">PERFORMANCE</span>
+<h3 class="font-h1 text-h1 text-white">Global Edge Runtime</h3>
+<p class="text-on-surface-variant max-w-md mt-sm">Execute logic at the nearest point of presence with sub-10ms latency globally.</p>
+</div>
+</div>
+<!-- Secondary Metric Card -->
+<div class="md:col-span-4 h-[400px] rounded-xl glass-panel p-lg flex flex-col justify-between border-primary/20 border-t-4">
+<div class="text-left">
+<span class="material-symbols-outlined text-primary text-4xl mb-md">query_stats</span>
+<h3 class="font-h2 text-h2">Uptime Reliability</h3>
+<p class="text-on-surface-variant text-caption mt-sm">SLA-backed 99.999% availability for mission critical systems.</p>
+</div>
+<div class="flex items-end justify-between">
+<span class="font-h1 text-5xl font-black text-secondary">99.9%</span>
+<div class="flex gap-1 h-12 items-end">
+<div class="w-1 bg-secondary/20 h-4 rounded-full"></div>
+<div class="w-1 bg-secondary/40 h-8 rounded-full"></div>
+<div class="w-1 bg-secondary/60 h-6 rounded-full"></div>
+<div class="w-1 bg-secondary/80 h-10 rounded-full"></div>
+<div class="w-1 bg-secondary h-12 rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Smaller Grid Items -->
+<div class="md:col-span-4 h-64 rounded-xl glass-panel p-lg flex flex-col justify-center items-center text-center gap-sm">
+<span class="material-symbols-outlined text-tertiary text-3xl">security</span>
+<h4 class="font-h2 text-h2">End-to-End Encryption</h4>
+<p class="text-caption text-on-surface-variant">AES-256 at rest and TLS 1.3 in transit.</p>
+</div>
+<div class="md:col-span-4 h-64 rounded-xl glass-panel p-lg flex flex-col justify-center items-center text-center gap-sm">
+<span class="material-symbols-outlined text-secondary text-3xl">hub</span>
+<h4 class="font-h2 text-h2">200+ Integrations</h4>
+<p class="text-caption text-on-surface-variant">Connect with your existing tech stack seamlessly.</p>
+</div>
+<div class="md:col-span-4 h-64 rounded-xl glass-panel p-lg flex flex-col justify-center items-center text-center gap-sm">
+<span class="material-symbols-outlined text-primary text-3xl">terminal</span>
+<h4 class="font-h2 text-h2">CLI First Design</h4>
+<p class="text-caption text-on-surface-variant">For developers who value speed and keyboard shortcuts.</p>
+</div>
+</div>
+</section>
+<!-- Footer Placeholder -->
+<footer class="mt-xl border-t border-outline-variant/30 py-xl px-lg">
+<div class="flex flex-col md:flex-row justify-between gap-xl">
+<div class="space-y-md">
+<div class="flex items-center gap-sm">
+<div class="w-6 h-6 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<span class="font-h2 text-h2 tracking-tighter">FLUXCORE</span>
+</div>
+<p class="text-on-surface-variant max-w-xs text-caption">The standard in modern cloud architecture and neural scaling infrastructure.</p>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-lg">
+<div class="space-y-sm">
+<h5 class="font-label-mono text-on-surface font-bold">RESOURCES</h5>
+<ul class="text-caption text-on-surface-variant space-y-xs">
+<li><a class="hover:text-primary" href="#">Docs</a></li>
+<li><a class="hover:text-primary" href="#">API</a></li>
+<li><a class="hover:text-primary" href="#">Status</a></li>
+</ul>
+</div>
+<div class="space-y-sm">
+<h5 class="font-label-mono text-on-surface font-bold">COMPANY</h5>
+<ul class="text-caption text-on-surface-variant space-y-xs">
+<li><a class="hover:text-primary" href="#">About</a></li>
+<li><a class="hover:text-primary" href="#">Blog</a></li>
+<li><a class="hover:text-primary" href="#">Careers</a></li>
+</ul>
+</div>
+<div class="space-y-sm">
+<h5 class="font-label-mono text-on-surface font-bold">LEGAL</h5>
+<ul class="text-caption text-on-surface-variant space-y-xs">
+<li><a class="hover:text-primary" href="#">Privacy</a></li>
+<li><a class="hover:text-primary" href="#">Terms</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="mt-xl pt-md border-t border-outline-variant/10 flex justify-between items-center text-caption text-on-surface-variant/50 font-label-mono">
+<span>© 2024 FLUXCORE INFRASTRUCTURE INC.</span>
+<div class="flex gap-md">
+<span class="material-symbols-outlined text-lg cursor-pointer hover:text-on-surface">public</span>
+<span class="material-symbols-outlined text-lg cursor-pointer hover:text-on-surface">hub</span>
+</div>
+</div>
+</footer>
+</main>
+<!-- Chat Widget - Collapsed Launcher State -->
+<!-- Positioned in the bottom-right corner -->
+<div class="fixed bottom-margin right-margin z-50">
+<!-- Pulse Effect Layers -->
+<div class="relative group">
+<!-- Launcher Button -->
+<button aria-label="Open Chat Support" class="w-16 h-16 rounded-full bg-[#6C63FF] shadow-2xl flex items-center justify-center text-white transition-all duration-300 transform hover:scale-110 active:scale-95 animate-widget-pulse cursor-pointer group" id="chat-launcher">
+<!-- Chat Bubble Icon -->
+<span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform duration-300" style="font-variation-settings: 'FILL' 1;">
+                    chat_bubble
+                </span>
+<!-- Notification Badge (Optional but adds SaaS polish) -->
+<span class="absolute top-0 right-0 w-4 h-4 bg-error rounded-full border-2 border-background animate-bounce"></span>
+</button>
+<!-- Tooltip / Preview text on Hover -->
+<div class="absolute right-20 top-1/2 -translate-y-1/2 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
+<div class="bg-surface-container-highest px-md py-sm rounded-lg border border-outline-variant whitespace-nowrap shadow-xl">
+<p class="font-label-mono text-label-mono text-on-surface">Questions? Chat with our AI</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Script for Micro-interactions -->
+<script>
+        document.getElementById('chat-launcher').addEventListener('click', function() {
+            // Placeholder logic for opening widget
+            this.classList.toggle('rotate-90');
+            console.log('Chat widget launcher clicked - Widget interface would toggle here.');
+        });
+
+        // Atmosphere: Subtle parallax or reveal effect on scroll
+        window.addEventListener('scroll', () => {
+            const panels = document.querySelectorAll('.glass-panel');
+            panels.forEach(panel => {
+                const speed = 0.05;
+                const rect = panel.getBoundingClientRect();
+                const visible = rect.top < window.innerHeight && rect.bottom > 0;
+                if (visible) {
+                    const yPos = -(window.scrollY * speed);
+                    // Just a subtle hint of movement
+                    // panel.style.transform = `translateY(${yPos}px)`;
+                }
+            });
+        });
+    </script>
+</body></html>

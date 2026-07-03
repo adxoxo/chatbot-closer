@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ffb4ab",
+                        "surface-tint": "#c4c0ff",
+                        "surface": "#131316",
+                        "secondary-fixed": "#86f8c9",
+                        "on-secondary-container": "#003121",
+                        "surface-container-high": "#2a2a2d",
+                        "inverse-on-surface": "#303033",
+                        "surface-bright": "#39393c",
+                        "outline-variant": "#464555",
+                        "primary-fixed-dim": "#c4c0ff",
+                        "surface-dim": "#131316",
+                        "tertiary-fixed-dim": "#ffb95d",
+                        "on-tertiary-container": "#3d2400",
+                        "inverse-surface": "#e4e1e6",
+                        "background": "#131316",
+                        "surface-container": "#1f1f22",
+                        "on-tertiary": "#462a00",
+                        "tertiary-fixed": "#ffddb7",
+                        "primary-fixed": "#e3dfff",
+                        "tertiary-container": "#c98100",
+                        "secondary": "#68dbae",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#100069",
+                        "primary": "#c4c0ff",
+                        "surface-container-lowest": "#0e0e11",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#353438",
+                        "surface-container-low": "#1b1b1e",
+                        "on-error": "#690005",
+                        "on-secondary-fixed": "#002115",
+                        "on-secondary-fixed-variant": "#00513a",
+                        "outline": "#918fa1",
+                        "on-background": "#e4e1e6",
+                        "on-primary-container": "#1b0091",
+                        "on-primary-fixed-variant": "#3622ca",
+                        "on-surface-variant": "#c7c4d8",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "surface-variant": "#353438",
+                        "on-secondary": "#003827",
+                        "on-surface": "#e4e1e6",
+                        "secondary-container": "#26a37a",
+                        "tertiary": "#ffb95d",
+                        "inverse-primary": "#4f44e2",
+                        "primary-container": "#8781ff",
+                        "on-primary": "#2000a4",
+                        "secondary-fixed-dim": "#68dbae",
+                        "on-tertiary-fixed": "#2a1700"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "48px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "margin": "24px"
+                    },
+                    "fontFamily": {
+                        "caption": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-mono": ["JetBrains Mono"],
+                        "h1-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "caption": ["12px", {"lineHeight": "1.4", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "h2": ["20px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "label-mono": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "h1-mobile": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .typing-dot {
+            animation: typing 1.4s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.3; }
+            30% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        .chat-shadow {
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-header {
+            backdrop-filter: blur(8px);
+            background: rgba(19, 19, 22, 0.85);
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body-md selection:bg-primary/30">
+<!-- Background Decoration (Brutalist SaaS Feel) -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
+
+</div>
+<!-- Main Content Canvas (Mock Dashboard Background) -->
+<main class="relative z-0 p-xl min-h-screen">
+<div class="max-w-6xl mx-auto grid grid-cols-12 gap-lg">
+<div class="col-span-12 border-b border-outline-variant pb-lg mb-lg">
+<h1 class="font-h1 text-h1 text-on-surface">Agency Pipeline</h1>
+<p class="font-body-lg text-on-surface-variant">Live view of active lead generation flows.</p>
+</div>
+<div class="col-span-4 h-48 bg-surface-container rounded-xl border border-outline-variant/30 flex flex-col p-lg gap-md">
+<div class="flex justify-between items-center">
+<span class="font-label-mono text-label-mono text-secondary">ACTIVE_CAMPAIGNS</span>
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+</div>
+<span class="font-h1 text-h1">12</span>
+<div class="mt-auto w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="w-2/3 h-full bg-secondary"></div>
+</div>
+</div>
+<div class="col-span-4 h-48 bg-surface-container rounded-xl border border-outline-variant/30 flex flex-col p-lg gap-md">
+<div class="flex justify-between items-center">
+<span class="font-label-mono text-label-mono text-primary">LEAD_VELOCITY</span>
+<span class="material-symbols-outlined text-primary">speed</span>
+</div>
+<span class="font-h1 text-h1">84%</span>
+<div class="mt-auto w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="w-5/6 h-full bg-primary"></div>
+</div>
+</div>
+<div class="col-span-4 h-48 bg-surface-container rounded-xl border border-outline-variant/30 flex flex-col p-lg gap-md">
+<div class="flex justify-between items-center">
+<span class="font-label-mono text-label-mono text-tertiary">CONVERSION_RATE</span>
+<span class="material-symbols-outlined text-tertiary">target</span>
+</div>
+<span class="font-h1 text-h1">4.2%</span>
+<div class="mt-auto w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="w-1/3 h-full bg-tertiary"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Chat Widget Container -->
+<div class="fixed bottom-lg right-lg w-[380px] h-[560px] bg-surface border border-outline-variant rounded-xl flex flex-col overflow-hidden chat-shadow z-50 transition-all duration-300 transform scale-100 origin-bottom-right" id="chat-widget">
+<!-- Header -->
+<header class="glass-header h-[72px] px-md flex items-center justify-between border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary font-bold overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional, minimalist vector icon representing an AI assistant. The logo features sharp geometric shapes with a high-tech corporate aesthetic, utilizing a palette of deep indigo and soft violet on a dark charcoal background. The lighting is crisp and modern, giving it a sleek, premium SaaS feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPtHqPgSl72CZtbZhRkyAcB7TH_QuN2BhO6oAEXdCXUzS3dC0hhMWrWmdsLw9uir51_p29CTj3RbTtykhWxiiJyvVhP2YAyHUo4quIRKnNBzoe-1NdfN5Y6Evdo6LQ2rdZerWORDxJ5zTJb5MS5NJ6nE-7XLxrVX7xV4FgxSg52bJCEWslLJd5zbwTm4aBQt5TkwF2I7ZoRPxsqgRJSScj_6zdeZiKH9b8GX3XGOX7ThSnp0yxP1xZ7dP6G87ULqnY-er1gVZSpRNO"/>
+</div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-surface"></div>
+</div>
+<div>
+<h2 class="font-h2 text-body-md font-semibold text-on-surface leading-tight">TQ Assistant</h2>
+<p class="font-caption text-caption text-secondary">Online</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors p-sm">minimize</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors p-sm">close</button>
+</div>
+</header>
+<!-- Message Area -->
+<div class="flex-1 overflow-y-auto p-md space-y-lg flex flex-col bg-[#0F0F12]" id="message-container">
+<!-- Bot Message -->
+<div class="flex flex-col gap-xs max-w-[85%] self-start">
+<div class="bg-surface-container text-on-surface p-md rounded-xl rounded-tl-none border-l-2 border-primary-container font-body-md leading-relaxed">
+                    Hi! How can I help you today?
+                </div>
+<span class="font-caption text-[10px] text-on-surface-variant ml-sm uppercase tracking-wider font-medium">TQ Assistant • 10:02 AM</span>
+</div>
+<!-- User Message -->
+<div class="flex flex-col gap-xs max-w-[85%] self-end">
+<div class="bg-primary text-on-primary p-md rounded-xl rounded-tr-none font-body-md leading-relaxed shadow-lg">
+                    I'm looking for lead generation services.
+                </div>
+<span class="font-caption text-[10px] text-on-surface-variant mr-sm text-right uppercase tracking-wider font-medium">You • 10:03 AM</span>
+</div>
+<!-- Bot Message -->
+<div class="flex flex-col gap-xs max-w-[85%] self-start">
+<div class="bg-surface-container text-on-surface p-md rounded-xl rounded-tl-none border-l-2 border-primary-container font-body-md leading-relaxed">
+                    Great! We specialize in that. Are you currently using any CRM?
+                </div>
+<span class="font-caption text-[10px] text-on-surface-variant ml-sm uppercase tracking-wider font-medium">TQ Assistant • 10:03 AM</span>
+</div>
+<!-- Typing Indicator -->
+<div class="flex items-center gap-sm self-start mt-sm">
+<div class="bg-surface-container-high px-md py-sm rounded-full flex gap-1 items-center border border-outline-variant/30">
+<div class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></div>
+<div class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></div>
+<div class="w-1.5 h-1.5 bg-primary rounded-full typing-dot"></div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<footer class="p-md border-t border-outline-variant bg-surface flex flex-col gap-sm">
+<div class="relative flex items-center">
+<input class="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-lg px-md py-sm text-body-md text-on-surface transition-all outline-none placeholder:text-on-surface-variant/50 pr-xl" placeholder="Type a message..." type="text"/>
+<button class="absolute right-sm p-xs text-primary hover:text-primary-container transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+<div class="flex justify-between items-center px-xs">
+<div class="flex gap-sm">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface text-lg">attach_file</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-on-surface text-lg">mood</button>
+</div>
+<span class="font-label-mono text-[10px] text-on-surface-variant/40">POWERED BY TQ AI</span>
+</div>
+</footer>
+</div>
+<!-- Floating Trigger (Hidden when expanded) -->
+<button class="hidden fixed bottom-lg right-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95 z-50" id="chat-trigger">
+<span class="material-symbols-outlined text-2xl">chat_bubble</span>
+</button>
+<script>
+        // Simple Interaction Logic
+        const chatWidget = document.getElementById('chat-widget');
+        const chatTrigger = document.getElementById('chat-trigger');
+        const closeBtn = chatWidget.querySelector('.material-symbols-outlined.text-on-surface-variant:last-child');
+        const minimizeBtn = chatWidget.querySelector('.material-symbols-outlined.text-on-surface-variant:first-child');
+        const messageContainer = document.getElementById('message-container');
+
+        closeBtn.addEventListener('click', () => {
+            chatWidget.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+            setTimeout(() => {
+                chatWidget.style.display = 'none';
+                chatTrigger.classList.remove('hidden');
+            }, 300);
+        });
+
+        minimizeBtn.addEventListener('click', () => {
+            chatWidget.classList.toggle('h-[72px]');
+            chatWidget.classList.toggle('h-[560px]');
+        });
+
+        chatTrigger.addEventListener('click', () => {
+            chatWidget.style.display = 'flex';
+            chatTrigger.classList.add('hidden');
+            setTimeout(() => {
+                chatWidget.classList.remove('opacity-0', 'scale-90', 'pointer-events-none');
+            }, 10);
+        });
+
+        // Scroll to bottom of message container
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+
+        // Simple input interaction
+        const input = chatWidget.querySelector('input');
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== '') {
+                const text = input.value.trim();
+                input.value = '';
+                
+                // Add User Message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'flex flex-col gap-xs max-w-[85%] self-end';
+                userMsg.innerHTML = `
+                    <div class="bg-primary text-on-primary p-md rounded-xl rounded-tr-none font-body-md leading-relaxed shadow-lg">
+                        ${text}
+                    </div>
+                    <span class="font-caption text-[10px] text-on-surface-variant mr-sm text-right uppercase tracking-wider font-medium">You • Just Now</span>
+                `;
+                
+                // Insert before typing indicator
+                const typingIndicator = messageContainer.querySelector('.items-center.gap-sm.self-start');
+                messageContainer.insertBefore(userMsg, typingIndicator);
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+        });
+    </script>
+</body></html>

@@ -4,9 +4,6 @@ A multi-tenant AI **funnel chatbot** that acts as a sales closer: it qualifies
 a visitor in real time, scores intent, and pushes hot leads straight to a
 booked Calendly call. Build once, reconfigure per client.
 
-> Read the design docs in this order: [`CLAUDE.md`](CLAUDE.md) → [`ARCHITECTURE.md`](ARCHITECTURE.md)
-> → [`BUILDPLAN.md`](BUILDPLAN.md) → [`RECONFIG.md`](RECONFIG.md) → [`COSTS.md`](COSTS.md).
-
 ---
 
 ## Stack

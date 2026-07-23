@@ -29,7 +29,7 @@ TENANTS = [
         ),
         "calendly_url": "https://calendly.com/techquarters/strategy-call",
         "scoring_weights": dict(DEFAULT_WEIGHTS),
-        "hot_threshold": 12.0,
+        "hot_threshold": 10.0,
         "warm_threshold": 6.0,
         "branding": {
             "primary_color": "#c4c0ff",
@@ -59,7 +59,7 @@ TENANTS = [
         ),
         "calendly_url": "https://calendly.com/acme-cloud/demo",
         "scoring_weights": {**DEFAULT_WEIGHTS, "weight_bs": 1.5, "weight_da": 2.0},
-        "hot_threshold": 12.0,
+        "hot_threshold": 10.0,
         "warm_threshold": 6.0,
         "branding": {
             "primary_color": "#68dbae",

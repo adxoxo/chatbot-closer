@@ -15,12 +15,16 @@ export interface Signals {
   decision_authority: number;
 }
 
+export type LlmStatus = "ok" | "mock" | "rate_limited" | "timeout" | "error";
+
 export interface ChatResponse {
   conversation_id: string;
   reply: string;
   state: LeadState;
   score: number;
   signals: Signals;
+  max_score: number;
+  llm_status: LlmStatus;
   calendly_url: string | null;
   capture_email: boolean;
 }

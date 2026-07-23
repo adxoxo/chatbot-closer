@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getLeadDetail, listLeads, listTenants } from "../lib/api";
+import { maxScore } from "../lib/score";
 import type { Lead, Message, Priority, Tenant } from "../lib/types";
 import { PriorityChip, StateChip } from "../lib/ui";
 import { TopBar } from "./AdminLayout";
@@ -34,6 +35,13 @@ export default function LeadsTable() {
     listTenants().then(setTenants).catch(() => {});
   }, []);
   useEffect(load, [includeTest, tenantFilter, priorityFilter]);
+
+  // Per-tenant score ceiling (SC-8) — leads can span tenants with different weights.
+  const maxByTenant = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const t of tenants) m[t.id] = maxScore(t.scoring_weights);
+    return m;
+  }, [tenants]);
 
   const filtered = leads.filter(
     (l) =>
@@ -129,7 +137,9 @@ export default function LeadsTable() {
                   <td className="px-md py-md text-on-surface-variant">{l.email || "—"}</td>
                   <td className="px-md py-md font-mono text-on-surface font-bold">
                     {l.score.toFixed(1)}
-                    <span className="text-on-surface-variant font-normal">/18</span>
+                    <span className="text-on-surface-variant font-normal">
+                      /{maxByTenant[l.tenant_id] ?? 16}
+                    </span>
                   </td>
                   <td className="px-md py-md">
                     <StateChip state={l.state} />
@@ -163,7 +173,11 @@ export default function LeadsTable() {
       </div>
 
       {selected && (
-        <LeadDrawer conversationId={selected} onClose={() => setSelected(null)} />
+        <LeadDrawer
+          conversationId={selected}
+          maxByTenant={maxByTenant}
+          onClose={() => setSelected(null)}
+        />
       )}
     </>
   );
@@ -171,9 +185,11 @@ export default function LeadsTable() {
 
 function LeadDrawer({
   conversationId,
+  maxByTenant,
   onClose,
 }: {
   conversationId: string;
+  maxByTenant: Record<string, number>;
   onClose: () => void;
 }) {
   const [data, setData] = useState<{ lead: Lead; messages: Message[] } | null>(null);
@@ -205,7 +221,10 @@ function LeadDrawer({
         ) : (
           <div className="flex-1 overflow-y-auto thin-scrollbar p-lg flex flex-col gap-lg">
             <div className="grid grid-cols-2 gap-md">
-              <Metric label="Score" value={`${data.lead.score.toFixed(1)}/18`} />
+              <Metric
+                label="Score"
+                value={`${data.lead.score.toFixed(1)}/${maxByTenant[data.lead.tenant_id] ?? 16}`}
+              />
               <Metric label="Priority" value={data.lead.priority.toUpperCase()} />
               <Metric label="State" value={data.lead.state} />
               <Metric label="Email" value={data.lead.email || "—"} />

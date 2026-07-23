@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getTenant } from "../lib/api";
-import type { Tenant } from "../lib/types";
+import { maxScore as computeMaxScore } from "../lib/score";
+import type { LlmStatus, Tenant } from "../lib/types";
 import { SIGNAL_LABELS } from "../lib/types";
 import ChatWidget from "../widget/ChatWidget";
 import type { ChatState } from "../widget/useChat";
@@ -22,11 +23,7 @@ export default function TestConsole() {
       .catch(() => setErr("Could not load tenant config."));
   }, [id]);
 
-  const maxScore = useMemo(() => {
-    if (!tenant) return 18;
-    const w = tenant.scoring_weights;
-    return (w.weight_bl + w.weight_bs + w.weight_pc + w.weight_u + w.weight_da) * 2;
-  }, [tenant]);
+  const maxScore = useMemo(() => computeMaxScore(tenant?.scoring_weights), [tenant]);
 
   if (err)
     return <FullMsg>{err}</FullMsg>;
@@ -52,6 +49,8 @@ export default function TestConsole() {
           Configure
         </a>
       </header>
+
+      <LlmStatusBanner status={chat?.llmStatus} />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left: chat console */}
@@ -207,6 +206,7 @@ export default function TestConsole() {
                   {
                     score: chat?.score ?? 0,
                     state: chat?.state ?? "GREETING",
+                    llm_status: chat?.llmStatus ?? "ok",
                     signals: chat?.signals ?? {},
                   },
                   null,
@@ -248,6 +248,67 @@ function FullMsg({ children }: { children: React.ReactNode }) {
   return (
     <div className="h-screen flex items-center justify-center font-label-mono text-label-mono text-on-surface-variant">
       {children}
+    </div>
+  );
+}
+
+// Diagnostic banner: tells you whether a degraded reply came from Groq being
+// down/rate-limited (not your logic) vs. a missing key. Admin-only — the
+// client widget never shows this.
+const LLM_STATUS_INFO: Record<
+  LlmStatus,
+  { icon: string; title: string; detail: string; tone: string } | null
+> = {
+  ok: null,
+  rate_limited: {
+    icon: "speed",
+    title: "Groq rate limit hit (429)",
+    detail:
+      "You've exceeded the free-tier tokens-per-minute limit. This reply used the built-in fallback, not the AI — that's why the answer looks off. Wait a minute and retry, or upgrade your Groq tier.",
+    tone: "tertiary",
+  },
+  timeout: {
+    icon: "timer_off",
+    title: "Groq request timed out",
+    detail:
+      "Groq didn't respond in time, so this reply used the fallback logic. Check Groq's status or your network, then retry.",
+    tone: "tertiary",
+  },
+  error: {
+    icon: "error",
+    title: "Groq API error",
+    detail:
+      "Groq rejected the request — usually a bad/expired GROQ_API_KEY or an invalid GROQ_MODEL. This reply used the fallback logic. Check the key in backend/.env.",
+    tone: "error",
+  },
+  mock: {
+    icon: "smart_toy",
+    title: "No AI key configured — running on mock",
+    detail:
+      "GROQ_API_KEY isn't set, so replies and scoring use the built-in mock. Set the key in backend/.env to use the real model.",
+    tone: "primary",
+  },
+};
+
+function LlmStatusBanner({ status }: { status?: LlmStatus }) {
+  if (!status || status === "ok") return null;
+  const info = LLM_STATUS_INFO[status];
+  if (!info) return null;
+  const toneCls =
+    info.tone === "error"
+      ? "bg-error/10 border-error/40 text-error"
+      : info.tone === "tertiary"
+      ? "bg-tertiary/10 border-tertiary/40 text-tertiary"
+      : "bg-primary/10 border-primary/40 text-primary";
+  return (
+    <div className={`shrink-0 border-b ${toneCls} px-lg py-sm flex items-start gap-sm`}>
+      <span className="material-symbols-outlined text-[18px] mt-0.5">{info.icon}</span>
+      <div className="flex flex-col">
+        <span className="font-label-mono text-[11px] font-bold uppercase tracking-wider">
+          {info.title}
+        </span>
+        <span className="text-body-md text-on-surface-variant">{info.detail}</span>
+      </div>
     </div>
   );
 }

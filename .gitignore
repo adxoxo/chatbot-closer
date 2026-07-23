@@ -1,5 +1,6 @@
 **/__pycache__/
 backend/venv/
+/.env
 backend/.env
 backend/tq.db
 frontend/node_modules/
@@ -8,6 +9,7 @@ frontend/.env
 *.Zone.Identifier
 
 # internal build/design docs (kept locally, not published)
+IMPROVEMENT.md
 CLAUDE.md
 ARCHITECTURE.md
 BUILDPLAN.md

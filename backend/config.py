@@ -23,8 +23,12 @@ USE_SUPABASE = bool(SUPABASE_URL and SUPABASE_SERVICE_KEY)
 # Groq (OpenAI-compatible) — primary LLM when set
 GROQ_API_KEY = _get("GROQ_API_KEY")
 GROQ_MODEL = _get("GROQ_MODEL", "llama-3.3-70b-versatile")
-# Mechanical scoring extraction runs on a cheaper/faster model with its own quota.
-GROQ_SCORING_MODEL = _get("GROQ_SCORING_MODEL", "llama-3.1-8b-instant")
+# Scoring correctness IS the product, so it runs on the strong model by default
+# (SC-2). Small models grade "probably" as "confirmed"; the evidence-based rubric
+# needs the reasoning of the 70B. Override with GROQ_SCORING_MODEL to A/B a
+# cheaper model against the rubric. Groq latency is small and the reply call runs
+# after scoring, so the user doesn't feel it.
+GROQ_SCORING_MODEL = _get("GROQ_SCORING_MODEL", "llama-3.3-70b-versatile")
 GROQ_BASE_URL = _get("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
 USE_GROQ = bool(GROQ_API_KEY)
 

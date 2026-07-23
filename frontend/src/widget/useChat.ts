@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { sendChat } from "../lib/api";
-import type { ChatResponse, LeadState, Message, Signals } from "../lib/types";
+import type { ChatResponse, LeadState, LlmStatus, Message, Signals } from "../lib/types";
 
 export interface StateEvent {
   state: LeadState;
@@ -18,6 +18,7 @@ export interface ChatState {
   captureEmail: boolean;
   history: StateEvent[];
   error: string | null;
+  llmStatus: LlmStatus;
 }
 
 const EMPTY_SIGNALS = null;
@@ -34,6 +35,7 @@ export function useChat(tenantId: string, isTest = false) {
     captureEmail: false,
     history: [{ state: "GREETING", at: nowTime() }],
     error: null,
+    llmStatus: "ok",
   });
   const convRef = useRef<string | null>(null);
 
@@ -83,6 +85,7 @@ export function useChat(tenantId: string, isTest = false) {
             signals: res.signals,
             calendlyUrl: res.calendly_url,
             captureEmail: res.capture_email,
+            llmStatus: res.llm_status ?? "ok",
             history: transitioned
               ? [...s.history, { state: res.state, at: nowTime() }]
               : s.history,
@@ -114,6 +117,7 @@ export function useChat(tenantId: string, isTest = false) {
       captureEmail: false,
       history: [{ state: "GREETING", at: nowTime() }],
       error: null,
+      llmStatus: "ok",
     });
   }, []);
 

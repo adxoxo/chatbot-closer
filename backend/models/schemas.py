@@ -34,6 +34,10 @@ class ChatResponse(BaseModel):
     state: str
     score: float
     signals: dict
+    max_score: float = 16.0  # dynamic per-tenant maximum (SC-8), not a hardcoded 18
+    # LLM health for this turn: ok | mock | rate_limited | timeout | error.
+    # Lets the admin UI distinguish "free-tier exhausted" from "bad logic".
+    llm_status: str = "ok"
     calendly_url: Optional[str] = None
     capture_email: bool = False
 
@@ -52,7 +56,10 @@ class TenantCreate(BaseModel):
     knowledge_base: Optional[str] = ""
     calendly_url: Optional[str] = ""
     scoring_weights: dict = Field(default_factory=lambda: dict(DEFAULT_WEIGHTS))
-    hot_threshold: float = 12.0
+    # Calibrated for the evidence-based rubric (SC-2/SC-8): with an honest scorer
+    # a genuine hot lead lands ~10–11.5 out of a 16 max, not ≥12. The CLOSING
+    # evidence gate (SC-3) — not this threshold — is what blocks contentless closes.
+    hot_threshold: float = 10.0
     warm_threshold: float = 6.0
     branding: dict = Field(default_factory=lambda: dict(DEFAULT_BRANDING))
     notification_email: Optional[str] = ""

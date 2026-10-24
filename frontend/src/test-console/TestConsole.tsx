@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getTenant } from "../lib/api";
 import { maxScore as computeMaxScore } from "../lib/score";
 import type { LlmStatus, Tenant } from "../lib/types";
@@ -7,12 +7,14 @@ import { SIGNAL_LABELS } from "../lib/types";
 import ChatWidget from "../widget/ChatWidget";
 import type { ChatState } from "../widget/useChat";
 import ScoreArc from "./ScoreArc";
+import { AdminHeader } from "../admin/AdminLayout";
+import { Button } from "../lib/ui";
 
 export default function TestConsole() {
   const { id = "" } = useParams();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [chat, setChat] = useState<ChatState | null>(null);
-  const [debug, setDebug] = useState(true);
+  const [debug, setDebug] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [widgetKey, setWidgetKey] = useState(0);
@@ -26,87 +28,28 @@ export default function TestConsole() {
   const maxScore = useMemo(() => computeMaxScore(tenant?.scoring_weights), [tenant]);
 
   if (err)
-    return <FullMsg>{err}</FullMsg>;
+    return <FullMsg>{err} <Button variant="secondary" onClick={() => window.location.reload()}>Retry</Button></FullMsg>;
   if (!tenant) return <FullMsg>loading…</FullMsg>;
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      {/* Top app bar */}
-      <header className="bg-surface border-b border-outline-variant px-lg py-md flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-lg">
-          <h1 className="text-h2 font-black uppercase tracking-tight text-on-surface">
-            TQ Chatbot Admin
-          </h1>
-          <span className="font-label-mono text-label-mono text-on-surface-variant">
-            / {tenant.name}
-          </span>
-        </div>
-        <a
-          href={`/admin/tenants/${id}`}
-          className="font-label-mono text-label-mono text-on-surface-variant hover:text-primary flex items-center gap-xs"
-        >
-          <span className="material-symbols-outlined text-[16px]">settings</span>
-          Configure
-        </a>
-      </header>
-
+    <div className="tq-admin"><AdminHeader />
+      <main className="workspace test-workspace">
+        <Link className="text-button inline-flex mb-md" to={`/admin/tenants/${id}`}>← Back to settings</Link>
+        <header className="page-heading"><div><h1>Test your chatbot</h1><p>{tenant.name}. These conversations stay separate from visitor leads.</p></div>
+          <div className="heading-actions"><Button variant="secondary" onClick={() => {setWidgetKey(k => k + 1); setChat(null);}}>New conversation</Button>
+            <Button variant="secondary" aria-expanded={debug} aria-controls="test-details" onClick={() => setDebug(d => !d)}>Test details</Button></div>
+        </header>
       <LlmStatusBanner status={chat?.llmStatus} />
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left: chat console */}
-        <section
-          className={`${debug ? "w-3/5" : "w-full"} flex flex-col bg-surface-container-lowest border-r border-outline-variant transition-all`}
-        >
-          <div className="px-lg py-sm bg-surface-container border-b border-outline-variant flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-md">
-              <div className="flex items-center gap-xs">
-                <span className="material-symbols-outlined text-secondary text-[18px]">terminal</span>
-                <span className="font-label-mono text-label-mono font-bold tracking-widest text-on-surface">
-                  TEST CONSOLE
-                </span>
-              </div>
-              <div className="h-4 w-px bg-outline-variant" />
-              <button
-                onClick={() => setDebug((d) => !d)}
-                className="flex items-center gap-sm bg-surface-container-lowest px-sm py-xs rounded border border-outline-variant"
-              >
-                <span className="font-label-mono text-[10px] text-on-surface-variant">DEBUG VIEW</span>
-                <span
-                  className={`w-8 h-4 rounded-full relative flex items-center px-xs transition-colors ${
-                    debug ? "bg-secondary" : "bg-outline-variant"
-                  }`}
-                >
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full bg-on-secondary transition-all ${
-                      debug ? "ml-auto" : "ml-0"
-                    }`}
-                  />
-                </span>
-                <span
-                  className={`font-label-mono text-[10px] font-bold ${
-                    debug ? "text-secondary" : "text-outline"
-                  }`}
-                >
-                  {debug ? "ON" : "OFF"}
-                </span>
-              </button>
-            </div>
-            <button
-              onClick={() => setWidgetKey((k) => k + 1)}
-              className="flex items-center gap-xs font-label-mono text-[11px] text-on-surface-variant hover:text-error transition-colors"
-            >
-              <span className="material-symbols-outlined text-[14px]">restart_alt</span>
-              RESET SESSION
-            </button>
-          </div>
-
+      <div className={`test-layout ${debug ? "with-details" : ""}`}>
+        <section className="test-chat-panel" aria-label="Test conversation">
           <div className="flex-1 overflow-hidden">
             <ChatWidget
               key={widgetKey}
               tenantId={id}
               branding={tenant.branding}
               isTest
-              showHeader={false}
+              showHeader
               onState={setChat}
             />
           </div>
@@ -114,10 +57,10 @@ export default function TestConsole() {
 
         {/* Right: debug panel */}
         {debug && (
-          <section className="w-2/5 flex flex-col bg-surface overflow-y-auto thin-scrollbar p-lg gap-lg">
+          <section id="test-details" aria-label="Test details" className="test-details flex flex-col gap-lg">
             <ScoreArc
               score={chat?.score ?? 0}
-              max={Math.round(maxScore)}
+              max={maxScore}
               state={chat?.state ?? "GREETING"}
             />
 
@@ -219,7 +162,8 @@ export default function TestConsole() {
             <div className="border border-outline-variant rounded-lg overflow-hidden">
               <button
                 onClick={() => setShowPrompt((s) => !s)}
-                className="w-full px-md py-sm bg-surface-container flex items-center justify-between"
+                aria-expanded={showPrompt}
+                className="w-full min-h-[44px] px-md py-sm bg-surface-container flex items-center justify-between"
               >
                 <span className="font-label-mono text-[10px] text-on-surface-variant font-bold uppercase">
                   System Prompt
@@ -240,6 +184,7 @@ export default function TestConsole() {
           </section>
         )}
       </div>
+      </main>
     </div>
   );
 }
@@ -301,7 +246,7 @@ function LlmStatusBanner({ status }: { status?: LlmStatus }) {
       ? "bg-tertiary/10 border-tertiary/40 text-tertiary"
       : "bg-primary/10 border-primary/40 text-primary";
   return (
-    <div className={`shrink-0 border-b ${toneCls} px-lg py-sm flex items-start gap-sm`}>
+    <div role="status" className={`mb-md rounded-lg border ${toneCls} px-lg py-sm flex items-start gap-sm`}>
       <span className="material-symbols-outlined text-[18px] mt-0.5">{info.icon}</span>
       <div className="flex flex-col">
         <span className="font-label-mono text-[11px] font-bold uppercase tracking-wider">

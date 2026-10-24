@@ -32,7 +32,7 @@ export default function ChatWidget({
   const primary = branding.primary_color || "#c4c0ff";
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }, [state.messages.length, state.sending, state.captureEmail, state.calendlyUrl]);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function ChatWidget({
 
   return (
     <div
-      className={`flex flex-col h-full bg-surface overflow-hidden ${className}`}
+      className={`tq-chat flex flex-col min-h-0 h-full bg-surface overflow-hidden ${className}`}
       style={{ ["--tq-primary" as any]: primary }}
     >
       {showHeader && (
@@ -72,20 +72,20 @@ export default function ChatWidget({
                   </span>
                 )}
               </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-surface" />
             </div>
             <div>
               <h2 className="text-body-md font-semibold text-on-surface leading-tight">
                 {botName}
               </h2>
-              <p className="text-caption text-secondary">Online</p>
+              <p className="text-caption text-on-surface-variant">{isTest ? "Test conversation" : "Ask us a question"}</p>
             </div>
           </div>
           <div className="flex gap-xs text-on-surface-variant">
             {onMinimize && (
               <button
                 onClick={onMinimize}
-                className="material-symbols-outlined hover:text-on-surface transition-colors p-xs"
+                aria-label="Minimize chat"
+                className="min-w-[44px] min-h-[44px] material-symbols-outlined hover:text-on-surface transition-colors p-xs"
                 title="Minimize"
               >
                 minimize
@@ -94,7 +94,8 @@ export default function ChatWidget({
             {onClose && (
               <button
                 onClick={onClose}
-                className="material-symbols-outlined hover:text-error transition-colors p-xs"
+                aria-label="Close chat"
+                className="min-w-[44px] min-h-[44px] material-symbols-outlined hover:text-error transition-colors p-xs"
                 title="Close"
               >
                 close
@@ -107,7 +108,11 @@ export default function ChatWidget({
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto thin-scrollbar p-md flex flex-col gap-lg bg-[#0F0F12]"
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+        aria-relevant="additions text"
+        className="min-h-0 flex-1 overflow-y-auto thin-scrollbar p-md flex flex-col gap-lg bg-[#0F0F12]"
       >
         {/* Welcome message */}
         <BotBubble botName={botName} primary={primary} time={nowTime()}>
@@ -139,7 +144,7 @@ export default function ChatWidget({
         )}
 
         {state.error && (
-          <div className="self-center text-caption text-error bg-error-container/20 border border-error/30 rounded-lg px-md py-sm">
+          <div role="alert" className="self-center text-caption text-error bg-error-container/20 border border-error/30 rounded-lg px-md py-sm">
             {state.error}
           </div>
         )}
@@ -147,35 +152,39 @@ export default function ChatWidget({
 
       {/* Input */}
       <footer className="p-md border-t border-outline-variant bg-surface flex flex-col gap-sm shrink-0">
-        <form onSubmit={submit} className="relative flex items-center">
+        <form onSubmit={submit} className="chat-composer flex items-center gap-sm">
           <input
+            aria-label="Your message"
+            autoComplete="off"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={state.sending}
             placeholder="Type a message..."
-            className="w-full bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-md py-sm text-body-md text-on-surface transition-all outline-none placeholder:text-on-surface-variant/50 pr-xl disabled:opacity-60"
+            className="min-w-0 flex-1 min-h-[46px] bg-surface-container-lowest border border-outline-variant focus:border-primary rounded-lg px-md py-sm text-body-md text-on-surface transition-all outline-none placeholder:text-on-surface-variant/50 disabled:opacity-60"
           />
           <button
             type="submit"
             disabled={state.sending || !input.trim()}
-            className="absolute right-sm w-8 h-8 rounded-lg flex items-center justify-center transition-all active:scale-95 disabled:opacity-40"
+            className="shrink-0 w-[46px] h-[46px] rounded-lg flex items-center justify-center transition-all active:scale-95 disabled:opacity-40"
             style={{ background: primary, color: "#2000a4" }}
-            title="Send"
+            title="Send message"
+            aria-label="Send message"
           >
             <span className="material-symbols-outlined icon-fill text-[18px]">send</span>
           </button>
         </form>
         <div className="flex justify-between items-center px-xs">
-          <span className="font-label-mono text-[10px] text-on-surface-variant/40">
+          <span className="text-xs text-on-surface-variant">
             {isTest ? "TEST MODE" : "POWERED BY TQ AI"}
           </span>
-          <button
+          {!isTest && <button
+            disabled={state.sending}
             onClick={reset}
-            className="font-label-mono text-[10px] text-on-surface-variant/40 hover:text-on-surface-variant transition-colors flex items-center gap-1"
+            className="min-h-[44px] text-xs text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1"
           >
             <span className="material-symbols-outlined text-[12px]">restart_alt</span>
-            reset
-          </button>
+            New chat
+          </button>}
         </div>
       </footer>
     </div>
@@ -194,9 +203,9 @@ function BotBubble({
   time: string;
 }) {
   return (
-    <div className="flex flex-col gap-xs max-w-[85%] self-start">
+    <div className="flex flex-col gap-xs max-w-[88%] break-words whitespace-pre-wrap self-start">
       <div
-        className="bg-surface-container text-on-surface p-md rounded-xl rounded-tl-none border-l-2 text-body-md leading-relaxed beveled-edge"
+        className="bg-surface-container text-on-surface p-md rounded-xl rounded-tl-none border-l-2 text-body-md leading-relaxed"
         style={{ borderColor: primary }}
       >
         {children}
@@ -218,7 +227,7 @@ function UserBubble({
   time: string;
 }) {
   return (
-    <div className="flex flex-col gap-xs max-w-[85%] self-end">
+    <div className="flex flex-col gap-xs max-w-[88%] break-words whitespace-pre-wrap self-end">
       <div
         className="p-md rounded-xl rounded-tr-none text-body-md leading-relaxed shadow-lg"
         style={{ background: primary, color: "#2000a4" }}
@@ -235,7 +244,8 @@ function UserBubble({
 function TypingIndicator({ primary }: { primary: string }) {
   return (
     <div className="flex items-center gap-sm self-start">
-      <div className="bg-surface-container-high px-md py-sm rounded-full flex gap-1 items-center border border-outline-variant/30">
+      <span className="sr-only" role="status">Assistant response in progress</span>
+      <div aria-hidden="true" className="bg-surface-container-high px-md py-sm rounded-full flex gap-1 items-center border border-outline-variant/30">
         {[0, 1, 2].map((i) => (
           <span
             key={i}
@@ -276,7 +286,7 @@ function CalendlyCard({
         target="_blank"
         rel="noreferrer"
         onClick={onBook}
-        className="mt-xs inline-flex items-center justify-center gap-xs bg-secondary text-on-secondary font-label-mono text-label-mono font-bold rounded-lg px-md py-sm hover:opacity-90 active:scale-[0.98] transition-all"
+        className="mt-xs min-h-[44px] inline-flex items-center justify-center gap-xs bg-secondary text-on-secondary font-label-mono text-label-mono font-bold rounded-lg px-md py-sm hover:opacity-90 active:scale-[0.98] transition-all"
       >
         Book My Call
         <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -319,20 +329,22 @@ function EmailCaptureCard({ conversationId }: { conversationId: string }) {
           <p className="text-body-md text-on-surface">
             Drop your email and we'll send over the relevant details.
           </p>
-          <form onSubmit={submit} className="flex gap-sm">
+          <form onSubmit={submit} className="email-form flex flex-wrap gap-sm">
             <input
               type="email"
+              aria-label="Email address"
+              autoComplete="email"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
                 setErr(null);
               }}
               placeholder="you@company.com"
-              className="flex-1 bg-surface-container-lowest border border-outline-variant focus:border-tertiary rounded-lg px-md py-sm text-body-md outline-none"
+              className="min-w-0 min-h-[44px] flex-1 bg-surface-container-lowest border border-outline-variant focus:border-tertiary rounded-lg px-md py-sm text-body-md outline-none"
             />
             <button
               type="submit"
-              className="bg-tertiary text-on-tertiary font-label-mono text-label-mono font-bold rounded-lg px-md py-sm hover:opacity-90 active:scale-[0.98] transition-all"
+              className="min-h-[44px] bg-tertiary text-on-tertiary font-label-mono text-label-mono font-bold rounded-lg px-md py-sm hover:opacity-90 active:scale-[0.98] transition-all"
             >
               Send
             </button>

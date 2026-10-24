@@ -8,30 +8,33 @@ export default function Dashboard() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
-  useEffect(() => {
+  const [loaded, setLoaded] = useState(false);
+  const load = () => {
+    setErr(null); setLoaded(false);
     Promise.all([listTenants(), listLeads({ include_test: false })])
       .then(([t, l]) => {
         setTenants(t);
-        setLeads(l);
+        setLeads(l); setLoaded(true);
       })
       .catch(() => setErr("Could not load data. Check the backend + admin key."));
-  }, []);
+  };
+  useEffect(load, []);
 
   const hot = leads.filter((l) => l.priority === "hot").length;
   const warm = leads.filter((l) => l.priority === "warm").length;
   const active = tenants.filter((t) => t.is_active).length;
-  const convRate = leads.length ? Math.round((hot / leads.length) * 100) : 0;
 
   return (
     <>
-      <TopBar title="Dashboard" />
-      <div className="p-lg flex flex-col gap-lg">
-        {err && <p className="text-error font-label-mono text-label-mono">{err}</p>}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-lg">
-          <Stat label="ACTIVE_TENANTS" value={`${active}`} icon="corporate_fare" color="primary" />
-          <Stat label="TOTAL_LEADS" value={`${leads.length}`} icon="leaderboard" color="primary" />
-          <Stat label="HOT_LEADS" value={`${hot}`} icon="local_fire_department" color="secondary" />
-          <Stat label="CONVERSION_RATE" value={`${convRate}%`} icon="target" color="tertiary" />
+      <TopBar title="Overview" />
+      <div className="flex flex-col gap-lg">
+        {err && <div className="notice" role="alert">Could not load the overview. <button className="text-button" onClick={load}>Retry</button></div>}
+        {!loaded && !err && <p role="status">Load overview…</p>}
+        {loaded && <>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
+          <Stat label="Active chatbots" value={`${active}`} icon="corporate_fare" color="primary" />
+          <Stat label="Total leads" value={`${leads.length}`} icon="leaderboard" color="primary" />
+          <Stat label="Hot leads" value={`${hot}`} icon="local_fire_department" color="secondary" />
         </div>
 
         <div className="bg-surface-container border border-outline-variant/40 rounded-xl p-lg">
@@ -49,6 +52,7 @@ export default function Dashboard() {
             />
           </div>
         </div>
+        </>}
       </div>
     </>
   );
@@ -69,10 +73,10 @@ function Stat({
   return (
     <div className="bg-surface-container rounded-xl border border-outline-variant/30 flex flex-col p-lg gap-md">
       <div className="flex justify-between items-center">
-        <span className={`font-label-mono text-label-mono ${text}`}>{label}</span>
+        <span className={`text-sm ${text}`}>{label}</span>
         <span className={`material-symbols-outlined ${text}`}>{icon}</span>
       </div>
-      <span className="font-h1 text-h1">{value}</span>
+      <span className="text-4xl font-medium">{value}</span>
     </div>
   );
 }

@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { deleteTenant, getTenant, updateTenant } from "../lib/api";
 import type { ScoringWeights, Tenant } from "../lib/types";
 import { Button, ConfirmDialog, Field, StatusChip, inputCls, textareaCls } from "../lib/ui";
-import ChatWidget from "../widget/ChatWidget";
 import EmbedCode from "./EmbedCode";
 
-const TABS = ["General", "Prompt & KB", "Scoring", "Branding", "Notifications"] as const;
+const TABS = ["General", "Instructions", "Scoring", "Appearance", "Notifications"] as const;
 type Tab = (typeof TABS)[number];
 
 export default function TenantDetail() {
@@ -14,12 +13,14 @@ export default function TenantDetail() {
   const nav = useNavigate();
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [draft, setDraft] = useState<Tenant | null>(null);
-  const [tab, setTab] = useState<Tab>("Prompt & KB");
+  const [tab, setTab] = useState<Tab>("General");
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [confirmDel, setConfirmDel] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [more, setMore] = useState(false);
+  const moreButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     getTenant(id)
@@ -27,7 +28,7 @@ export default function TenantDetail() {
         setTenant(t);
         setDraft(t);
       })
-      .catch(() => setErr("Could not load tenant."));
+      .catch(() => setErr("Could not load this chatbot."));
   }, [id]);
 
   const dirty = useMemo(
@@ -35,7 +36,7 @@ export default function TenantDetail() {
     [tenant, draft]
   );
 
-  if (err) return <Centered>{err}</Centered>;
+  if (err && !draft) return <Centered>{err} <Button variant="secondary" onClick={() => window.location.reload()}>Retry</Button></Centered>;
   if (!draft) return <Centered>loading…</Centered>;
 
   const patch = (p: Partial<Tenant>) => setDraft({ ...draft, ...p });
@@ -65,86 +66,47 @@ export default function TenantDetail() {
       await deleteTenant(id);
       nav("/admin/tenants");
     } catch {
-      setErr("Delete failed.");
+      setErr("Delete failed. Please try again.");
+      setConfirmDel(false); moreButton.current?.focus();
       setDeleting(false);
     }
   };
 
   return (
     <>
-      {/* Top bar */}
-      <header className="sticky top-0 z-40 w-full bg-surface border-b border-outline-variant px-lg pt-md flex flex-col gap-md">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-lg">
-            <button
-              onClick={() => nav("/admin/tenants")}
-              className="text-on-surface-variant hover:text-primary transition-colors"
-            >
-              <span className="material-symbols-outlined">arrow_back</span>
-            </button>
-            <h1 className="text-h2 font-black text-on-surface">{draft.name}</h1>
-            <StatusChip active={draft.is_active} />
-          </div>
-          <div className="flex items-center gap-md">
-            <Button
-              variant="secondary"
-              onClick={() => patch({ is_active: !draft.is_active })}
-              title="Toggle active — remember to Save"
-            >
-              <span className="material-symbols-outlined text-[16px] align-middle mr-1">
-                {draft.is_active ? "toggle_on" : "toggle_off"}
-              </span>
-              {draft.is_active ? "Disable" : "Enable"}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => window.open(`/admin/tenants/${id}/test`, "_blank")}
-            >
-              <span className="material-symbols-outlined text-[16px] align-middle mr-1">terminal</span>
-              Test Bot
-            </Button>
-            <button
-              onClick={() => setConfirmDel(true)}
-              title="Delete tenant"
-              className="px-md py-sm rounded-lg font-label-mono text-label-mono font-bold border border-error/40 text-error hover:bg-error/10 transition-all active:scale-95"
-            >
-              Delete
-            </button>
-            <Button onClick={save} disabled={saving || !dirty}>
-              {saving ? "Saving…" : dirty ? "Save Changes" : "Saved"}
-            </Button>
+      <button className="text-button mb-md" onClick={() => nav("/admin/tenants")}>← All chatbots</button>
+      <header className="page-heading">
+        <div><div className="settings-heading"><h1>{tenant?.name}</h1><StatusChip active={tenant?.is_active ?? false}/></div>
+          <p>Adjust your chatbot, save your changes, then try it out.</p></div>
+        <div className="heading-actions">
+          <Button variant="secondary" onClick={() => window.open(`/admin/tenants/${id}/test`, "_blank", "noopener")}>Test chatbot ↗</Button>
+          <Button onClick={save} disabled={saving || !dirty}>{saving ? "Save…" : "Save changes"}</Button>
+          <div className="more-wrap">
+            <button ref={moreButton} className="more-button" aria-expanded={more} aria-controls="chatbot-more" onClick={() => setMore(v => !v)}>More</button>
+            {more && <><button className="menu-dismiss" aria-label="Close more actions" onClick={() => setMore(false)}/><div className="more-menu" id="chatbot-more" onKeyDown={e => { if(e.key === "Escape") setMore(false); }}>
+              <button onClick={() => { patch({is_active: !draft.is_active}); setMore(false); }}>{draft.is_active ? "Disable chatbot" : "Enable chatbot"}</button>
+              <button className="text-error" onClick={() => { setConfirmDel(true); setMore(false); }}>Delete chatbot</button>
+            </div></>}
           </div>
         </div>
-        <nav className="flex gap-lg">
-          {TABS.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`pb-2 font-label-mono text-label-mono transition-all ${
-                tab === t
-                  ? "text-primary border-b-2 border-primary font-bold"
-                  : "text-on-surface-variant hover:text-primary"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </nav>
       </header>
-
-      <div className="flex-1 flex overflow-hidden">
+      {err && <p className="notice" role="alert">{err} Your changes are still here. Please try again.</p>}
+      <nav className="settings-tabs" aria-label="Chatbot settings">
+        {TABS.map(t => <button key={t} aria-current={tab === t ? "page" : undefined} onClick={() => setTab(t)}>{t}</button>)}
+      </nav>
+      <div className="settings-body">
         {/* Left: editors */}
-        <div className="flex-1 overflow-y-auto thin-scrollbar p-lg space-y-lg">
+        <fieldset disabled={saving || deleting} className="settings-content space-y-lg min-w-0">
           {tab === "General" && (
             <div className="space-y-lg max-w-2xl">
-              <Field label="Tenant Name">
+              <Field label="Chatbot name">
                 <input
                   className={inputCls}
                   value={draft.name}
                   onChange={(e) => patch({ name: e.target.value })}
                 />
               </Field>
-              <Field label="Calendly URL" hint="Where hot leads are sent in CLOSING state.">
+              <Field label="Call booking link" hint="Send qualified visitors here to book a call.">
                 <input
                   className={inputCls}
                   value={draft.calendly_url}
@@ -159,26 +121,22 @@ export default function TenantDetail() {
                   label={draft.is_active ? "Bot is live" : "Bot is disabled"}
                 />
               </Field>
-              <div className="pt-md border-t border-outline-variant/30">
-                <h3 className="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant mb-md">
-                  Embed Code
-                </h3>
-                <EmbedCode tenantId={id} />
-              </div>
+              <details className="embed-details"><summary>Add to your website</summary><EmbedCode tenantId={id} /></details>
             </div>
           )}
 
-          {tab === "Prompt & KB" && (
+          {tab === "Instructions" && (
             <div className="space-y-lg">
               <section className="space-y-sm">
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-primary text-sm">terminal</span>
                   <h3 className="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">
-                    System Prompt
+                    Chatbot instructions
                   </h3>
                 </div>
                 <textarea
-                  className={`${textareaCls} h-[340px] text-primary`}
+                  aria-label="Chatbot instructions"
+                  className={`${textareaCls} h-[280px]`}
                   value={draft.system_prompt}
                   onChange={(e) => patch({ system_prompt: e.target.value })}
                   placeholder="Define the bot's role, personality and closing rules…"
@@ -188,11 +146,12 @@ export default function TenantDetail() {
                 <div className="flex items-center gap-sm">
                   <span className="material-symbols-outlined text-tertiary text-sm">database</span>
                   <h3 className="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant">
-                    Knowledge Base
+                    Business knowledge
                   </h3>
                 </div>
                 <textarea
-                  className={`${textareaCls} h-[260px] !font-sans text-on-surface-variant`}
+                  aria-label="Business knowledge"
+                  className={`${textareaCls} h-[220px] !font-sans text-on-surface-variant`}
                   value={draft.knowledge_base}
                   onChange={(e) => patch({ knowledge_base: e.target.value })}
                   placeholder="Services, pricing, FAQs, qualification criteria…"
@@ -205,7 +164,7 @@ export default function TenantDetail() {
             <ScoringTab draft={draft} patch={patch} patchWeights={patchWeights} />
           )}
 
-          {tab === "Branding" && (
+          {tab === "Appearance" && (
             <div className="space-y-lg max-w-2xl">
               <Field label="Primary Color">
                 <div className="flex items-center gap-md">
@@ -213,9 +172,11 @@ export default function TenantDetail() {
                     type="color"
                     value={draft.branding.primary_color}
                     onChange={(e) => patchBranding({ primary_color: e.target.value })}
-                    className="w-12 h-10 rounded-lg bg-surface border border-outline-variant cursor-pointer"
+                    aria-label="Choose primary color"
+                    className="w-12 h-12 rounded-lg bg-surface border border-outline-variant cursor-pointer"
                   />
                   <input
+                    aria-label="Primary color code"
                     className={`${inputCls} font-mono`}
                     value={draft.branding.primary_color}
                     onChange={(e) => patchBranding({ primary_color: e.target.value })}
@@ -275,45 +236,20 @@ export default function TenantDetail() {
           )}
 
           <div className="pt-md flex items-center justify-between border-t border-outline-variant/30">
-            <span className="flex items-center gap-xs text-[12px] text-on-surface-variant/60">
+            <span role="status" className="flex items-center gap-xs text-xs text-on-surface-variant">
               <span className="material-symbols-outlined text-[14px]">save</span>
-              {savedAt ? `Last saved at ${savedAt}` : "Not saved yet"}
+              {dirty ? "Unsaved changes. Save before you test." : savedAt ? `Last saved at ${savedAt}` : "All changes saved"}
             </span>
-            <div className="flex gap-sm">
-              <Button variant="secondary" onClick={() => setDraft(tenant)} disabled={!dirty}>
-                Discard
-              </Button>
-              <Button onClick={save} disabled={saving || !dirty}>
-                Save Configuration
-              </Button>
-            </div>
+            <Button variant="ghost" onClick={() => { setDraft(tenant); setErr(null); }} disabled={!dirty || saving}>Discard changes</Button>
           </div>
-          {err && <p className="text-error font-label-mono text-label-mono">{err}</p>}
-        </div>
+        </fieldset>
 
-        {/* Right: live preview */}
-        <div className="w-[420px] bg-surface-container border-l border-outline-variant flex flex-col p-lg shrink-0">
-          <h3 className="font-label-mono text-label-mono uppercase tracking-widest text-on-surface-variant mb-md">
-            Widget Preview
-          </h3>
-          <div className="flex-1 rounded-2xl border border-outline-variant overflow-hidden chat-shadow">
-            <ChatWidget
-              key={draft.branding.primary_color + draft.branding.bot_name + id}
-              tenantId={id}
-              branding={draft.branding}
-              isTest
-              showHeader
-            />
-          </div>
-          <p className="text-center text-[10px] text-on-surface-variant/50 mt-sm font-label-mono">
-            Live • runs against this tenant in test mode
-          </p>
-        </div>
       </div>
 
       {confirmDel && (
         <ConfirmDialog
-          title="Delete tenant?"
+          returnFocus={moreButton}
+          title="Delete chatbot?"
           danger
           busy={deleting}
           confirmLabel="Delete permanently"
@@ -328,7 +264,7 @@ export default function TenantDetail() {
             </>
           }
           onConfirm={doDelete}
-          onCancel={() => setConfirmDel(false)}
+          onCancel={() => { setConfirmDel(false); moreButton.current?.focus(); }}
         />
       )}
     </>
@@ -376,7 +312,7 @@ function ScoringTab({
                   step={0.5}
                   value={w[r.key]}
                   onChange={(e) => patchWeights({ [r.key]: parseFloat(e.target.value) } as any)}
-                  className="flex-1 accent-primary"
+                  className="flex-1 min-w-0 min-h-[44px] accent-primary"
                 />
                 <span className="font-mono text-label-mono text-primary w-12 text-right">
                   ×{w[r.key].toFixed(1)}
@@ -415,13 +351,13 @@ function ScoringTab({
         <div className="mt-md flex h-8 rounded-lg overflow-hidden border border-outline-variant font-label-mono text-[10px] uppercase">
           <div
             className="bg-outline/30 flex items-center justify-center text-on-surface-variant"
-            style={{ width: `${(draft.warm_threshold / max) * 100}%` }}
+            style={{ width: `${max > 0 ? Math.min(100, Math.max(0, draft.warm_threshold / max * 100)) : 0}%` }}
           >
             Cold
           </div>
           <div
             className="bg-tertiary/30 flex items-center justify-center text-tertiary"
-            style={{ width: `${((draft.hot_threshold - draft.warm_threshold) / max) * 100}%` }}
+            style={{ width: `${max > 0 ? Math.min(100, Math.max(0, (draft.hot_threshold - draft.warm_threshold) / max * 100)) : 0}%` }}
           >
             Warm
           </div>
@@ -446,8 +382,10 @@ function Toggle({
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={on}
       onClick={() => onChange(!on)}
-      className="flex items-center gap-md"
+      className="min-h-[44px] flex items-center gap-md"
     >
       <span
         className={`w-10 h-5 rounded-full relative transition-colors ${

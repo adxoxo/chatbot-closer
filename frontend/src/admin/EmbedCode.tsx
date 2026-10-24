@@ -31,11 +31,13 @@ export default function EmbedCode({ tenantId }: { tenantId: string }) {
 
 function Snippet({ label, code }: { label: string; code: string }) {
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState(false);
   const copy = async () => {
     try {
+      setError(false);
       await navigator.clipboard.writeText(code);
     } catch {
-      /* clipboard may be blocked; ignore */
+      setError(true); return;
     }
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
@@ -48,7 +50,7 @@ function Snippet({ label, code }: { label: string; code: string }) {
         </span>
         <button
           onClick={copy}
-          className="flex items-center gap-1 font-label-mono text-[10px] text-primary hover:underline"
+          className="min-h-[44px] flex items-center gap-1 text-xs text-primary hover:underline"
         >
           <span className="material-symbols-outlined text-[14px]">
             {copied ? "check" : "content_copy"}
@@ -56,6 +58,7 @@ function Snippet({ label, code }: { label: string; code: string }) {
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
+      {error && <p role="alert" className="text-sm text-error">Copy is unavailable. Select the code below and copy it manually.</p>}
       <pre className="bg-surface-container-lowest border border-outline-variant rounded-lg p-md font-mono text-[11px] text-primary/80 overflow-x-auto whitespace-pre-wrap thin-scrollbar">
         {code}
       </pre>

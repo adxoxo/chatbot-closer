@@ -1,6 +1,6 @@
 """Provider-agnostic LLM layer.
 
-Priority: Groq (OpenAI-compatible) → Gemini → deterministic mock.
+Priority: DeepSeek → Groq (both OpenAI-compatible) → Gemini → deterministic mock.
 Whichever is configured first wins. The mock keeps the whole system runnable
 with zero keys.
 
@@ -82,9 +82,19 @@ def _retry_after_seconds(r: httpx.Response) -> float:
         return val / 1000 if m.group(2) == "ms" else val
     return 1.0
 
+# The OpenAI-compatible provider in use: (log tag, base URL, key, reply model, scoring model).
+if config.USE_DEEPSEEK:
+    _COMPAT = ("deepseek", config.DEEPSEEK_BASE_URL, config.DEEPSEEK_API_KEY,
+               config.DEEPSEEK_MODEL, config.DEEPSEEK_SCORING_MODEL)
+elif config.USE_GROQ:
+    _COMPAT = ("groq", config.GROQ_BASE_URL, config.GROQ_API_KEY,
+               config.GROQ_MODEL, config.GROQ_SCORING_MODEL)
+else:
+    _COMPAT = None
+
 # Optional Gemini fallback (lazy)
 _gemini_model = None
-if not config.USE_GROQ and config.USE_GEMINI:
+if _COMPAT is None and config.USE_GEMINI:
     import google.generativeai as genai
 
     genai.configure(api_key=config.GEMINI_API_KEY)
@@ -96,9 +106,9 @@ if not config.USE_GROQ and config.USE_GEMINI:
 # ──────────────────────────────────────────────────────────────────
 async def get_completion(messages: list[dict], system_prompt: str) -> str:
     """Conversational reply. `messages` = [{role:user|assistant, content}] chrono."""
-    if config.USE_GROQ:
-        out = await _groq_chat(
-            model=config.GROQ_MODEL,
+    if _COMPAT:
+        out = await _compat_chat(
+            model=_COMPAT[3],
             messages=[{"role": "system", "content": system_prompt}] + messages,
             max_tokens=400,
             temperature=0.6,
@@ -114,9 +124,9 @@ async def get_completion(messages: list[dict], system_prompt: str) -> str:
 
 async def get_json(prompt: str, scoring: bool = False) -> dict:
     """Single-shot prompt expected to return a JSON object."""
-    if config.USE_GROQ:
-        model = config.GROQ_SCORING_MODEL if scoring else config.GROQ_MODEL
-        out = await _groq_chat(
+    if _COMPAT:
+        model = _COMPAT[4] if scoring else _COMPAT[3]
+        out = await _compat_chat(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=500,  # nested per-signal score+evidence JSON needs headroom
@@ -133,9 +143,9 @@ async def get_json(prompt: str, scoring: bool = False) -> dict:
 
 
 # ──────────────────────────────────────────────────────────────────
-# Groq (OpenAI-compatible)
+# DeepSeek / Groq (OpenAI-compatible)
 # ──────────────────────────────────────────────────────────────────
-async def _groq_chat(model: str, messages: list[dict], max_tokens: int,
+async def _compat_chat(model: str, messages: list[dict], max_tokens: int,
                      temperature: float, json_mode: bool = False) -> str:
     body = {
         "model": model,
@@ -145,38 +155,45 @@ async def _groq_chat(model: str, messages: list[dict], max_tokens: int,
     }
     if json_mode:
         body["response_format"] = {"type": "json_object"}
+    tag, base_url, api_key = _COMPAT[0], _COMPAT[1], _COMPAT[2]
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             for attempt in range(_MAX_RETRIES + 1):
                 r = await client.post(
-                    f"{config.GROQ_BASE_URL}/chat/completions",
-                    headers={"Authorization": f"Bearer {config.GROQ_API_KEY}"},
+                    f"{base_url}/chat/completions",
+                    headers={"Authorization": f"Bearer {api_key}"},
                     json=body,
                 )
                 if r.status_code == 429:
                     if attempt < _MAX_RETRIES:
                         wait = min(_retry_after_seconds(r) + 0.25, _MAX_BACKOFF_S)
-                        print(f"[groq] 429 rate-limited, retry {attempt + 1}/{_MAX_RETRIES} in {wait:.2f}s")
+                        print(f"[{tag}] 429 rate-limited, retry {attempt + 1}/{_MAX_RETRIES} in {wait:.2f}s")
                         await asyncio.sleep(wait)
                         continue
-                    print("[groq] 429 rate-limited — retries exhausted (free-tier TPM?)")
+                    print(f"[{tag}] 429 rate-limited — retries exhausted")
                     _record(STATUS_RATE_LIMITED)
                     return ""
                 if r.status_code != 200:
-                    print(f"[groq] {r.status_code}: {r.text[:200]}")
+                    print(f"[{tag}] {r.status_code}: {r.text[:200]}")
                     _record(STATUS_ERROR)
                     return ""
                 data = r.json()
+                content = (data["choices"][0]["message"]["content"] or "").strip()
+                # DeepSeek's JSON mode occasionally answers 200 with empty content;
+                # retry rather than let scoring fall through to the keyword heuristic.
+                if json_mode and not content and attempt < _MAX_RETRIES:
+                    print(f"[{tag}] empty JSON reply, retry {attempt + 1}/{_MAX_RETRIES}")
+                    continue
                 _record(STATUS_OK)
-                return (data["choices"][0]["message"]["content"] or "").strip()
+                return content
             _record(STATUS_RATE_LIMITED)
             return ""  # exhausted retries
     except httpx.TimeoutException as e:
-        print(f"[groq] timeout: {e}")
+        print(f"[{tag}] timeout: {e}")
         _record(STATUS_TIMEOUT)
         return ""
     except Exception as e:
-        print(f"[groq] error: {e}")
+        print(f"[{tag}] error: {e}")
         _record(STATUS_ERROR)
         return ""
 

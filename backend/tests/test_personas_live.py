@@ -6,7 +6,7 @@ asserts the behavioural contract (expect_hot / forbid_hot / no_close_turn1).
 
 This is the single test the whole product is judged on: does a high-intent
 visitor get booked, and does a vague one get left alone? It needs a live LLM
-key (GROQ_API_KEY or GEMINI_API_KEY); without one it skips, since the
+key (DEEPSEEK_API_KEY, GROQ_API_KEY or GEMINI_API_KEY); without one it skips, since the
 deterministic keyword heuristic is not the thing under test.
 
 Scoring is user-only, so we don't need to interleave real assistant replies to
@@ -30,7 +30,7 @@ WARM_THRESHOLD = 6.0
 
 
 def _live_available() -> bool:
-    return bool(config.USE_GROQ or config.USE_GEMINI)
+    return bool(config.USE_DEEPSEEK or config.USE_GROQ or config.USE_GEMINI)
 
 
 async def _walk(messages: list[str]) -> list[dict]:

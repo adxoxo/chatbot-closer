@@ -20,7 +20,14 @@ SUPABASE_URL = _get("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = _get("SUPABASE_SERVICE_KEY")
 USE_SUPABASE = bool(SUPABASE_URL and SUPABASE_SERVICE_KEY)
 
-# Groq (OpenAI-compatible) — primary LLM when set
+# DeepSeek (OpenAI-compatible) — primary LLM when set
+DEEPSEEK_API_KEY = _get("DEEPSEEK_API_KEY")
+DEEPSEEK_MODEL = _get("DEEPSEEK_MODEL", "deepseek-flash")
+DEEPSEEK_SCORING_MODEL = _get("DEEPSEEK_SCORING_MODEL", DEEPSEEK_MODEL)
+DEEPSEEK_BASE_URL = _get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+USE_DEEPSEEK = bool(DEEPSEEK_API_KEY)
+
+# Groq (OpenAI-compatible) — used when DeepSeek is not set
 GROQ_API_KEY = _get("GROQ_API_KEY")
 GROQ_MODEL = _get("GROQ_MODEL", "llama-3.3-70b-versatile")
 # Scoring correctness IS the product, so it runs on the strong model by default
@@ -51,10 +58,17 @@ SQLITE_PATH = os.path.join(os.path.dirname(__file__), "tq.db")
 
 
 def summary() -> dict:
-    llm = "groq" if USE_GROQ else ("gemini" if USE_GEMINI else "mock")
+    if USE_DEEPSEEK:
+        llm, llm_model = "deepseek", DEEPSEEK_MODEL
+    elif USE_GROQ:
+        llm, llm_model = "groq", GROQ_MODEL
+    elif USE_GEMINI:
+        llm, llm_model = "gemini", GEMINI_MODEL
+    else:
+        llm, llm_model = "mock", "mock"
     return {
         "storage": "supabase" if USE_SUPABASE else "sqlite",
         "llm": llm,
-        "llm_model": GROQ_MODEL if USE_GROQ else (GEMINI_MODEL if USE_GEMINI else "mock"),
+        "llm_model": llm_model,
         "notify": "n8n (per-tenant webhook)",
     }

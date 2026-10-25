@@ -82,7 +82,8 @@ journalctl --user -u tqchat-backend -f                    # logs
 **After changing frontend code:** `cd frontend && npm run build`, then
 `systemctl --user restart tqchat-backend` (it serves `frontend/dist`).
 
-Active config (`backend/.env`): `llm:groq` (`llama-3.3-70b-versatile` for
+Active config (`backend/.env`): `llm:deepseek` (`deepseek-flash` for replies and scoring;
+the previous Groq setup used `llama-3.3-70b-versatile` for
 replies, `llama-3.1-8b-instant` for the scoring extraction),
 `notify:n8n (per-tenant webhook)`, `storage:sqlite`. Groq is preferred over
 Gemini whenever `GROQ_API_KEY` is set —
